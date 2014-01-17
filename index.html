@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Convert Wunderlist Export</title>
+  </head>
+  <body>
+    <form name="convert_wunderlist_export">
+      <h2>Input</h2>
+      <textarea name="input" rows="15" cols="80"></textarea><br />
+
+      <input type="submit" value="Convert" />
+
+      <h2>Output</h2>
+      <textarea name="output" rows="15" cols="80"></textarea>
+    </form>
+
+    <script>
+      var convertWunderlistExport = {
+        // The Wunderlist export is a little strange in that the lists and their tasks are separated.  You have to link them up by yourself.
+        combineListsAndTasks: function (raw) {
+          var tasksByList = {
+            inbox: {
+              title: 'Inbox',
+              tasks: []
+            }
+          };
+
+          raw.lists.forEach(function (list) {
+            tasksByList[list.id] = list;
+            tasksByList[list.id].tasks = [];
+          });
+
+          raw.tasks.forEach(function (task) {
+            tasksByList[task.list_id].tasks.push(task);
+          });
+
+          return tasksByList;
+        },
+
+        // Assuming `raw` contains the Wunderlist export JSON, this outputs Markdown like this:
+        //
+        //     ## Inbox
+        //
+        //       - [ ] Incomplete task
+        //
+        //     ## List 1
+        //     
+        //       - [ ] 2013-01-08 Task with due date
+        //
+        //     ## List 2
+        //
+        //       - [ ] Starred task #star
+        //       - [x] Completed task
+        toMarkdown: function (raw) {
+          function presentTask(task) {
+            return {
+              title:   task.title.trim(),
+              check:   task.completed_at ? 'x' : ' ',
+              dueDate: task.due_date ? task.due_date + ' ' : '',
+              star:    task.starred ? ' #star' : ''
+            };
+          }
+
+          function presentList(list) {
+            return {
+              title: list.title.trim(),
+              tasks: list.tasks.map(presentTask)
+            };
+          }
+
+          function presentLists(lists) {
+            return Object.keys(lists).map(function (listId) {
+              return presentList(lists[listId]);
+            });
+          }
+
+          // `p` prefix stands for "presented"
+
+          function templateTask(pTask) {
+            return '  - [' + pTask.check + '] ' + pTask.dueDate + pTask.title + pTask.star;
+          }
+
+          function templateList(pList) {
+            return [
+              '## ' + pList.title,
+              '',
+              pList.tasks.map(templateTask).join("\n")
+            ].join("\n");
+          }
+
+          function templateLists(pLists) {
+            return pLists.map(templateList).join("\n\n");
+          }
+
+          var lists = this.combineListsAndTasks(raw);
+          return templateLists(presentLists(lists));
+        }
+      };
+
+      // No jQuery dependency for now
+      document.forms.convert_wunderlist_export.onsubmit = function (event) {
+        var form = this, raw
+
+        event.preventDefault();
+        
+        raw = JSON.parse(form.input.value);
+        form.output.value = convertWunderlistExport.toMarkdown(raw);
+      };
+    </script>
+  </body>
+</html>
