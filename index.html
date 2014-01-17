@@ -2,17 +2,24 @@
 <html>
   <head>
     <title>Convert Wunderlist Export</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css" />
   </head>
   <body>
-    <form name="convert_wunderlist_export">
-      <h2>Input</h2>
-      <textarea name="input" rows="15" cols="80"></textarea><br />
+    <a href="https://github.com/benjaminoakes/WunderlistConverter"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
 
-      <input type="submit" value="Convert" />
+    <div class="container">
+      <form name="convert_wunderlist_export">
+        <h2>Input (Wunderlist export JSON)</h2>
+        <textarea name="input" rows="15" cols="80"></textarea><br />
 
-      <h2>Output</h2>
-      <textarea name="output" rows="15" cols="80"></textarea>
-    </form>
+        <input type="submit" value="Convert" class="btn btn-default" />
+
+        <h2>Output (Markdown task list)</h2>
+        <textarea name="output" rows="15" cols="80"></textarea>
+      </form>
+    </div>
 
     <script>
       var convertWunderlistExport = {
