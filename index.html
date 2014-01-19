@@ -14,9 +14,13 @@
         <h2>Input (Wunderlist export JSON)</h2>
         <textarea name="input" rows="15" cols="80"></textarea><br />
 
+        <select name="exportType">
+          <option value="toMarkdown">Markdown</option>
+          <option value="toTaskpaper">Taskpaper</option>
+        </select>
         <input type="submit" value="Convert" class="btn btn-default" />
 
-        <h2>Output (Markdown task list)</h2>
+        <h2>Output</h2>
         <textarea name="output" rows="15" cols="80"></textarea>
       </form>
     </div>
@@ -42,6 +46,61 @@
           });
 
           return tasksByList;
+        },
+
+        // Assuming `raw` contains the Wunderlist export JSON, this outputs Taskpaper like this:
+        //
+        //     Inbox:
+        //     	- Incomplete task
+        //
+        //     List 1:
+        //     	- Task with due date @due(2013-01-08)
+        //
+        //     List 2:
+        //     	- Starred task @star
+        //     	- Completed task @done
+        toTaskpaper: function (raw) {
+          function presentTask(task) {
+            return {
+              title:   task.title.trim(),
+              done:    task.completed_at ? '@done ' : '',
+              dueDate: task.due_date ? '@due(' + task.due_date + ') ' : '',
+              star:    task.starred ? '@star ' : ''
+            };
+          }
+
+          function presentList(list) {
+            return {
+              title: list.title.trim(),
+              tasks: list.tasks.map(presentTask)
+            };
+          }
+
+          function presentLists(lists) {
+            return Object.keys(lists).map(function (listId) {
+              return presentList(lists[listId]);
+            });
+          }
+
+          // `p` prefix stands for "presented"
+
+          function templateTask(pTask) {
+            return '\t- ' + pTask.title + ' ' + pTask.dueDate + pTask.done + pTask.star;
+          }
+
+          function templateList(pList) {
+            return [
+              pList.title + ':',
+              pList.tasks.map(templateTask).join("\n")
+            ].join("\n");
+          }
+
+          function templateLists(pLists) {
+            return pLists.map(templateList).join("\n\n");
+          }
+
+          var lists = this.combineListsAndTasks(raw);
+          return templateLists(presentLists(lists));
         },
 
         // Assuming `raw` contains the Wunderlist export JSON, this outputs Markdown like this:
@@ -106,12 +165,14 @@
 
       // No jQuery dependency for now
       document.forms.convert_wunderlist_export.onsubmit = function (event) {
-        var form = this, raw
+        var form = this, raw, methodName;
 
         event.preventDefault();
         
         raw = JSON.parse(form.input.value);
-        form.output.value = convertWunderlistExport.toMarkdown(raw);
+
+        methodName = form.exportType.value;
+        form.output.value = convertWunderlistExport[methodName](raw);
       };
     </script>
   </body>

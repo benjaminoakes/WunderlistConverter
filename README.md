@@ -1,5 +1,4 @@
-WunderlistConverter
-===================
+# WunderlistConverter
 
 Tools to convert Wunderlist backups to other formats.  It's currently [just a standalone webpage](http://benjaminoakes.github.io/WunderlistConverter/) where you paste in your Wunderlist JSON.
 
@@ -7,9 +6,18 @@ Tools to convert Wunderlist backups to other formats.  It's currently [just a st
 ![Flattr this git repo](https://api.flattr.com/button/flattr-badge-large.png)
 ](https://flattr.com/submit/auto?user_id=benjaminoakes&url=https://github.com/benjaminoakes/WunderlistConverter&title=maid&language=en_GB&tags=github&category=software)
 
-Currently, the only output is Markdown.  It's meant as an example of how Wunderlist backups can be transformed into other formats.  Pull requests with additional formats are welcome!
+The following formats are supported:
 
-The example GitHub-Flavored Markdown format looks like this:
+  * GitHub-Flavored Markdown
+  * Taskpaper
+
+Pull requests with additional formats are welcome!
+
+## Formats
+
+### GitHub-Flavored Markdown
+
+Example:
 
      ## Inbox
 
@@ -23,3 +31,17 @@ The example GitHub-Flavored Markdown format looks like this:
 
        - [ ] Starred task #star
        - [x] Completed task
+
+### Taskpaper
+
+Example:
+
+    Inbox:
+    	- Incomplete task
+    
+    List 1:
+    	- Task with due date @due(2013-01-08)
+    
+    List 2:
+      - Starred task @star
+      - Completed task @done
