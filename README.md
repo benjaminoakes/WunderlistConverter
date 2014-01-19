@@ -43,5 +43,5 @@ Example:
     	- Task with due date @due(2013-01-08)
     
     List 2:
-      - Starred task @star
-      - Completed task @done
+    	- Starred task @star
+    	- Completed task @done
