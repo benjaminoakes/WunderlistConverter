@@ -16,6 +16,7 @@
 
         <select name="exportType">
           <option value="toTaskpaper">Taskpaper</option>
+          <option value="toTodoTxt">todo.txt</option>
           <option value="toMarkdown">Markdown</option>
         </select>
         <input type="submit" value="Convert" class="btn btn-default" />
@@ -102,6 +103,49 @@
 
           function templateLists(pLists) {
             return pLists.map(templateList).join("\n\n");
+          }
+
+          var lists = this.combineListsAndTasks(raw);
+          return templateLists(presentLists(lists));
+        },
+
+        toTodoTxt: function (raw) {
+          function presentTask(listTitle, task) {
+            return {
+              title:   task.title.trim(),
+              done:    task.completed_at ? 'x ' : '',
+              dueDate: task.due_date ? ' ' + task.due_date : '',
+              star:    task.starred ? ' @star' : '',
+              project: ' +' + listTitle.trim().replace(/\s+/, '_')
+            };
+          }
+
+          function presentList(list) {
+            return {
+              tasks: list.tasks.map(function (task) { return presentTask(list.title, task); })
+            };
+          }
+
+          function presentLists(lists) {
+            return Object.keys(lists).map(function (listId) {
+              return presentList(lists[listId]);
+            });
+          }
+
+          // `p` prefix stands for "presented"
+
+          function templateTask(pTask) {
+            return pTask.done + pTask.title + pTask.dueDate + pTask.project + pTask.star;
+          }
+
+          function templateList(pList) {
+            return [
+              pList.tasks.map(templateTask).join("\n")
+            ].join("\n");
+          }
+
+          function templateLists(pLists) {
+            return pLists.map(templateList).join("\n");
           }
 
           var lists = this.combineListsAndTasks(raw);
