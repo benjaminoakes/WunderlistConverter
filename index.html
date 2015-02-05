@@ -42,12 +42,12 @@
             }
           };
 
-          raw.lists.forEach(function (list) {
+          raw.data.lists.forEach(function (list) {
             tasksByList[list.id] = list;
             tasksByList[list.id].tasks = [];
           });
 
-          raw.tasks.forEach(function (task) {
+          raw.data.tasks.forEach(function (task) {
             tasksByList[task.list_id].tasks.push(task);
           });
 
