@@ -164,7 +164,7 @@
         //
         //     ## List 2
         //
-        //       - [ ] Starred task #star
+        //       - [ ] Starred task @star
         //       - [x] Completed task
         toMarkdown: function (raw) {
           function presentTask(task) {
@@ -172,7 +172,7 @@
               title:   task.title.trim(),
               check:   task.completed_at ? 'x' : ' ',
               dueDate: task.due_date ? task.due_date + ' ' : '',
-              star:    task.starred ? ' #star' : ''
+              star:    task.starred ? ' @star' : ''
             };
           }
 
