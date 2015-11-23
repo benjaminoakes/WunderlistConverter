@@ -45,3 +45,13 @@ Example:
     List 2:
     	- Starred task @star
     	- Completed task @done
+
+### Coma Separated Values (CSV)
+
+Example:
+
+	List;Parent;Task;Is Done;Is Stared;Creation Date;Due Date;Completion Date
+	Inbox;Root;Incomplete Task;False;False;;;
+	List 1;Root;Task with due data;False;False;;2013-01-08;
+	List 2;Root;Starred task;False;True;;;
+	List 2;Root;Completed task;True;False;;;2015-11-23

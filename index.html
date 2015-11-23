@@ -18,6 +18,7 @@
           <option value="toTaskpaper">Taskpaper</option>
           <option value="toTodoTxt">todo.txt</option>
           <option value="toMarkdown">Markdown</option>
+          <option value="toCSV">Coma Separated Values (CSV)</option>
         </select>
         <input type="submit" value="Convert" class="btn btn-default" />
 
@@ -248,6 +249,72 @@
 
           function templateLists(pLists) {
             return pLists.map(templateList).join("\n\n");
+          }
+
+          var lists = this.combineListsAndTasks(raw);
+          return templateLists(presentLists(lists));
+        },
+
+        toCSV: function (raw) {
+          function presentSubtask(list, task, subtask) {
+            return {
+              list:     list.title.trim().replace(";", "|"),
+              title:    subtask.title.trim().replace(";", "|"),
+              parent:   task.title.trim().replace(";", "|"),
+              check:    subtask.completed_at ? 'True' : 'False',
+              star:     'False',
+              cre_date: subtask.created_at ? task.created_at + ' ' : '',
+              due_date: '',
+              com_date: subtask.completed_at ? task.completed_at + ' ' : ''
+            };
+          }
+
+          function presentTask(list, task) {
+            return {
+              list:     list.title.trim().replace(";", "|"),
+              title:    task.title.trim().replace(";", "|"),
+              parent:   'Root',
+              check:    task.completed_at ? 'True' : 'False',
+              star:     task.starred ? 'True' : 'False',
+              cre_date: task.created_at ? task.created_at + ' ' : '',
+              due_date: task.due_date ? task.due_date + ' ' : '',
+              com_date: task.completed_at ? task.completed_at + ' ' : '',
+              subtasks: task.subtasks.map(function(subtask) { return presentSubtask(list, task, subtask) }),
+//              notes:    task.notes.map(presentNote),
+            };
+          }
+
+          function presentList(list) {
+            return {
+              tasks: list.tasks.map(function(task) { return presentTask(list, task); })
+            };
+          }
+
+          function presentLists(lists) {
+            return Object.keys(lists).map(function (listId) {
+              return presentList(lists[listId]);
+            });
+          }
+
+          // `p` prefix stands for "presented"
+
+          function templateTaskGeneric(pTask) {
+            return [ pTask.list, pTask.parent, pTask.title, pTask.check, pTask.star, pTask.cre_date, pTask.due_date, pTask.com_date].join(";");
+          }
+
+          function templateTask(pTask) {
+            return [
+              templateTaskGeneric(pTask),
+              pTask.subtasks.map(templateTaskGeneric).join("\n")
+            ].join("\n");
+          }
+
+          function templateList(pList) {
+            return pList.tasks.map(templateTask).join("\n");
+          }
+
+          function templateLists(pLists) {
+            return 'List;Parent;Task;Is Done;Is Starred;Creation Date;Due Date;Completion Date\n' + pLists.map(templateList);
           }
 
           var lists = this.combineListsAndTasks(raw);
