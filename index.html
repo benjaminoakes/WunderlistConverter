@@ -42,6 +42,8 @@
             }
           };
 
+          var tasksByTaskId = { };
+
           raw.data.lists.forEach(function (list) {
             tasksByList[list.id] = list;
             tasksByList[list.id].tasks = [];
@@ -49,6 +51,18 @@
 
           raw.data.tasks.forEach(function (task) {
             tasksByList[task.list_id].tasks.push(task);
+
+            tasksByTaskId[task.id] = task;
+            tasksByTaskId[task.id].notes = [];
+            tasksByTaskId[task.id].subtasks = [];
+          });
+
+          raw.data.notes.forEach(function (note) {
+            tasksByTaskId[note.task_id].notes.push(note);
+          });
+
+          raw.data.subtasks.forEach(function (subtask) {
+            tasksByTaskId[subtask.task_id].subtasks.push(subtask);
           });
 
           return tasksByList;
@@ -167,12 +181,29 @@
         //       - [ ] Starred task @star
         //       - [x] Completed task
         toMarkdown: function (raw) {
+          function presentNote(note) {
+            return {
+              content: note.content.trim().replace(/\n/g, "\n\t\t\t"),
+            };
+          }
+
+          function presentSubtask(subtask) {
+            return {
+              title:   subtask.title.trim(),
+              check:   subtask.completed_at ? 'x' : ' ',
+              dueDate: subtask.due_date ? task.due_date + ' ' : '',
+            };
+          }
+
           function presentTask(task) {
             return {
-              title:   task.title.trim(),
-              check:   task.completed_at ? 'x' : ' ',
-              dueDate: task.due_date ? task.due_date + ' ' : '',
-              star:    task.starred ? ' @star' : ''
+              title:    task.title.trim(),
+              check:    task.completed_at ? 'x' : ' ',
+              dueDate:  task.due_date ? task.due_date + ' ' : '',
+              star:     task.starred ? ' @star' : '',
+              subtasks: task.subtasks.map(presentSubtask),
+              notes:    task.notes.map(presentNote),
+              hasDetail:task.notes.length + task.subtasks.length > 0 ? "\n" : "",
             };
           }
 
@@ -191,8 +222,20 @@
 
           // `p` prefix stands for "presented"
 
+          function templateNote(pNote) {
+            return '\t\t\t' + pNote.content;
+          }
+
+          function templateSubtask(pSubtask) {
+            return '\t\t- [' + pSubtask.check + '] ' + pSubtask.dueDate + pSubtask.title;
+          }
+
           function templateTask(pTask) {
-            return '  - [' + pTask.check + '] ' + pTask.dueDate + pTask.title + pTask.star;
+            return [
+              '\t- [' + pTask.check + '] ' + pTask.dueDate + pTask.title + pTask.star + pTask.hasDetail,
+              pTask.subtasks.map(templateSubtask).join("\n"),
+              pTask.notes.map(templateNote).join("\n")
+            ].join("");
           }
 
           function templateList(pList) {
