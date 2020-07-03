@@ -2,6 +2,10 @@
 
 Tools to convert Wunderlist backups to other formats.  It's currently [just a standalone webpage](http://benjaminoakes.github.io/WunderlistConverter/) where you paste in your Wunderlist JSON.
 
+This tool is archived [because Wunderlist is going away](https://export.wunderlist.com/):
+
+> You can export your data through Sunday, November 15, 2020.
+
 [
 ![Flattr this git repo](https://api.flattr.com/button/flattr-badge-large.png)
 ](https://flattr.com/submit/auto?user_id=benjaminoakes&url=https://github.com/benjaminoakes/WunderlistConverter&title=maid&language=en_GB&tags=github&category=software)
